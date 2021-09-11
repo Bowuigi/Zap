@@ -10,7 +10,7 @@ search_v = {
 
 info_v = {
 	curl=[[ curl -sL 'aur.archlinux.org/rpc/?v=5&type=info&arg[]=%s' ]],
-	jq=[[ jq -r '.results[0] | "Package \(.Name), version \(.Version).\n\(.Description)\nMaintained by \(.Maintainer)\nLicenses\n\(.License | @tsv)\nDepends on\n \(.Depends | @tsv)\nRequires those for compilation\n\(.MakeDepends | @tsv)\nOptionally depends on\n\(.OptDepends | @tsv)"' | tr '\t' ' ' ]]
+	jq=[[ jq -r '.results[0] | "Package \(.Name), version \(.Version).\n\(.Description)\nMaintained by \(.Maintainer)\nLicenses\n\(.License | @tsv?)\nDepends on\n \(.Depends | @tsv?)\nRequires those for compilation\n\(.MakeDepends | @tsv?)\nOptionally depends on\n\(.OptDepends | @tsv?)"' | tr '\t' ' ' ]]
 }
 
 function sh(cmd)
