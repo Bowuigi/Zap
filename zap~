@@ -67,4 +67,4 @@ else
         end
 end
 
-print(r)
+print(r or "No operation specified!")
