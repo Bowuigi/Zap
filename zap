@@ -75,7 +75,12 @@ elseif (arg[1]=="info") then
 		r=info(arg[2])
 	end
 else
-
+        if (arg[1]==nil) then
+                io.write("Search for ")
+                r=search(io.read())
+        else
+                r=search(arg[1])
+        end
 end
 
-print(r or "No operation specified!")
+print(r)
