@@ -74,6 +74,19 @@ elseif (arg[1]=="info") then
 	else
 		r=info(arg[2])
 	end
+elseif (arg[1]=="help") then
+	print("----------------------------------------------------")
+	print("Zap, A lightning fast AUR searcher")
+	print("By Bowuigi")
+	print("")
+	print("Zap Usage:")
+	print("")
+	print("zap search   ---   finds a package on the AUR")
+	print("zap info     ---   gets info on a package on the AUR")
+	print("")
+	print("no argument defaults to search")
+	print("----------------------------------------------------")
+	return
 else
         if (arg[1]==nil) then
                 io.write("Search for ")
