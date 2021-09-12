@@ -10,7 +10,7 @@ search_v = {
 
 info_v = {
 	curl=[[ curl -sL 'aur.archlinux.org/rpc/?v=5&type=info&arg[]=%s' ]],
-	jq=[[ jq -r '.results[0] | "Package \(.Name), version \(.Version).\n\(.Description)\nMaintained by \(.Maintainer)\nLicenses\n\(.License | @tsv?)\nDepends on\n \(.Depends | @tsv?)\nRequires those for compilation\n\(.MakeDepends | @tsv?)\nOptionally depends on\n\(.OptDepends | @tsv?)"' | tr '\t' ' ' ]]
+	jq=[[ jq -r '.results[0] | "Package %s\(.Name)%s, version %s\(.Version)%s.\n\(.Description)\nMaintained by %s\(.Maintainer)%s" , "%sLicenses%s\n\(.License | @tsv?)" , "%sDepends on%s\n\(.Depends | @tsv?)" , "%sRequires those for compilation%s\n\(.MakeDepends | @tsv?)" , "%sOptionally depends on%s\n\(.OptDepends | @tsv?)" , "Repo link: %shttps://aur.archlinux.org/\(.Name).git%s"' | tr '\t' ' ' ]]
 }
 
 function sh(cmd)
@@ -39,7 +39,23 @@ function info(package)
 	return sh (
 		string.format    (
 			info_v.curl.." | "..info_v.jq,
-			package
+			package,
+			"\027[1;34m",
+			"\027[1;0m",
+			"\027[1;34m",
+			"\027[1;0m",
+			"\027[1;34m",
+			"\027[1;0m",
+			"\027[1;34m",
+			"\027[1;0m",
+			"\027[1;34m",
+			"\027[1;0m",
+			"\027[1;34m",
+			"\027[1;0m",
+			"\027[1;34m",
+			"\027[1;0m",
+			"\027[1;36m",
+			"\027[1;0m"
 		)
 	)
 end
@@ -58,6 +74,19 @@ elseif (arg[1]=="info") then
 	else
 		r=info(arg[2])
 	end
+elseif (arg[1]=="help") then
+	print("----------------------------------------------------")
+	print("Zap, A lightning fast AUR searcher")
+	print("By Bowuigi")
+	print("")
+	print("Zap Usage:")
+	print("")
+	print("zap search   ---   finds a package on the AUR")
+	print("zap info     ---   gets info on a package on the AUR")
+	print("")
+	print("no argument defaults to search")
+	print("----------------------------------------------------")
+	return
 else
         if (arg[1]==nil) then
                 io.write("Search for ")
