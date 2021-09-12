@@ -1,1 +1,1 @@
-sudo install zap /usr/bin
+sudo install zap /usr/local/bin

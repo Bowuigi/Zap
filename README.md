@@ -5,7 +5,7 @@ A lightning fast AUR searcher (might evolve into a helper)
 Installation
 ------------
 
-Just place the `zap` program somewhere on your **PATH**, or use the install.sh script which will place it in /usr/bin.
+Just place the `zap` program somewhere on your **PATH**, or use the install.sh script which will place it in /usr/local/bin.
 
 Usage
 -----
