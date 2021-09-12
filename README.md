@@ -21,7 +21,7 @@ zap search
 
 The second one asks for a package too, but on **stdin** instead of **arg**
 
-There is also an experimental Package info command, to use it do
+There is also a package info command, to use it do
 
 ```sh
 zap info [package]
@@ -33,9 +33,12 @@ or, to read from **stdin**
 zap info
 ```
 
+
 ```sh
 zap help
 ```
 to provide basic usage commands.
 
 Be aware that it might have bugs or not work on some cases
+=======
+
