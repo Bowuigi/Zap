@@ -34,10 +34,11 @@ zap info
 ```
 
 
+To provide basic usage commands, use
+
 ```sh
 zap help
 ```
-to provide basic usage commands.
 
 Be aware that it might have bugs or not work on some cases
 =======
