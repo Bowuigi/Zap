@@ -5,12 +5,12 @@
 
 search_v = {
 	curl = [[ curl -s 'https://aur.archlinux.org/rpc/?v=5&type=search&by=name-desc&arg=%s' ]],
-	jq = [[ jq -r '.results | .[] | "%s\(.Maintainer)%s/%s\(.Name)%s\n\(.Description)\n%shttps://aur.archlinux.org/\(.Name).git%s\n"' ]]
+	jq = [[ jq -r '.results | .[] | "%s\(.Maintainer)%s/%s\(.Name)%s\n\(.Description)\n%https://saur.archlinux.org/\(.Name).git%s\n"' ]]
 }
 
 info_v = {
 	curl=[[ curl -sL 'aur.archlinux.org/rpc/?v=5&type=info&arg[]=%s' ]],
-	jq=[[ jq -r '.results[0] | "Package \(.Name), version \(.Version).\n\(.Description)\nMaintained by \(.Maintainer)\nLicenses\n\(.License | @tsv?)\nDepends on\n \(.Depends | @tsv?)\nRequires those for compilation\n\(.MakeDepends | @tsv?)\nOptionally depends on\n\(.OptDepends | @tsv?)"' | tr '\t' ' ' ]]
+	jq=[[ jq -r '.results[0] | "Package %s\(.Name)%s, version %s\(.Version)%s.\n\(.Description)\nMaintained by %s\(.Maintainer)%s" , "%sLicenses%s\n\(.License | @tsv?)" , "%sDepends on%s\n\(.Depends | @tsv?)" , "%sRequires those for compilation%s\n\(.MakeDepends | @tsv?)" , "%sOptionally depends on%s\n\(.OptDepends | @tsv?)" , "Repo link: %shttps://aur.archlinux.org/\(.Name).git%s"' | tr '\t' ' ' ]]
 }
 
 function sh(cmd)
@@ -39,7 +39,23 @@ function info(package)
 	return sh (
 		string.format    (
 			info_v.curl.." | "..info_v.jq,
-			package
+			package,
+			"\027[1;34m",
+			"\027[1;0m",
+			"\027[1;34m",
+			"\027[1;0m",
+			"\027[1;34m",
+			"\027[1;0m",
+			"\027[1;34m",
+			"\027[1;0m",
+			"\027[1;34m",
+			"\027[1;0m",
+			"\027[1;34m",
+			"\027[1;0m",
+			"\027[1;34m",
+			"\027[1;0m",
+			"\027[1;36m",
+			"\027[1;0m"
 		)
 	)
 end
