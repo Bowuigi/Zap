@@ -5,7 +5,7 @@
 
 search_v = {
 	curl = [[ curl -s 'https://aur.archlinux.org/rpc/?v=5&type=search&by=name-desc&arg=%s' ]],
-	jq = [[ jq -r '.results | .[] | "%s\(.Maintainer)%s/%s\(.Name)%s\n\(.Description)\n%saur.archlinux.org/\(.Name).git%s\n"' ]]
+	jq = [[ jq -r '.results | .[] | "%s\(.Maintainer)%s/%s\(.Name)%s\n\(.Description)\n%shttps://aur.archlinux.org/\(.Name).git%s\n"' ]]
 }
 
 info_v = {
