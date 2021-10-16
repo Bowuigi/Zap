@@ -2,10 +2,14 @@
 
 A lightning fast AUR searcher (might evolve into a helper)
 
+Now rewritten!
+
 Installation
 ------------
 
-Just place the `zap` program somewhere on your **PATH**, or use the install.sh script which will place it in /usr/local/bin.
+Place the `zap` program somewhere on your **PATH**, I reccomend **/usr/local/bin**.
+
+Run `zap`, it should give an error with a bunch of paths, choose one of those paths and put the rxi-json.lua file there, for example, place it on **/usr/share/lua/5.3/**
 
 Usage
 -----
@@ -39,7 +43,3 @@ To provide basic usage commands, use
 ```sh
 zap help
 ```
-
-Be aware that it might have bugs or not work on some cases
-=======
-

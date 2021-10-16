@@ -1,100 +1,140 @@
-#!/usr/bin/luajit
+#!/usr/bin/lua5.3
+-- Replace the Lua version if required
 
--- Zap, A lightning fast AUR searcher
--- By Bowuigi
+local json = require("rxi-json")
 
-search_v = {
-	curl = [[ curl -s 'https://aur.archlinux.org/rpc/?v=5&type=search&by=name-desc&arg=%s' ]],
-	jq = [[ jq -r '.results | .[] | "%s\(.Maintainer)%s/%s\(.Name)%s\n\(.Description)\n%shttps://aur.archlinux.org/\(.Name).git%s\n"' ]]
+local base_url = "https://aur.archlinux.org"
+
+local c = {
+	blue = "\027[1;34m",
+	cyan = "\027[1;36m",
+	normal = "\027[0m"
 }
 
-info_v = {
-	curl=[[ curl -sL 'aur.archlinux.org/rpc/?v=5&type=info&arg[]=%s' ]],
-	jq=[[ jq -r '.results[0] | "Package %s\(.Name)%s, version %s\(.Version)%s.\n\(.Description)\nMaintained by %s\(.Maintainer)%s" , "%sLicenses%s\n\(.License | @tsv?)" , "%sDepends on%s\n\(.Depends | @tsv?)" , "%sRequires those for compilation%s\n\(.MakeDepends | @tsv?)" , "%sOptionally depends on%s\n\(.OptDepends | @tsv?)" , "Repo link: %shttps://aur.archlinux.org/\(.Name).git%s"' | tr '\t' ' ' ]]
-}
+-- From the Programming in Lua book
+function escape(s)
+	s = string.gsub(s, "([&=+%c])", function (c)
+		return string.format("%%%02X", string.byte(c))
+	end)
+	s = string.gsub(s, " ", "+")
+	return s
+end
 
-function sh(cmd)
-	local f=io.popen(cmd,r)
-	local tmp=f:read("*a")
+function request(url)
+	local f = io.popen("curl -sL '"..url.."'")
+	local r = f:read("*a")
 	f:close()
-	return tmp
+	return r
 end
 
-function search(package)
-	return sh (
-		string.format (
-			search_v.curl.." | "..search_v.jq,
-			package,
-			"\027[1;36m",
-			"\027[0m",
-			"\027[1;34m",
-			"\027[0m",
-			"\027[1;34m",
-			"\027[0m"
-		)
-	)
-end
-
-function info(package)
-	return sh (
-		string.format    (
-			info_v.curl.." | "..info_v.jq,
-			package,
-			"\027[1;34m",
-			"\027[1;0m",
-			"\027[1;34m",
-			"\027[1;0m",
-			"\027[1;34m",
-			"\027[1;0m",
-			"\027[1;34m",
-			"\027[1;0m",
-			"\027[1;34m",
-			"\027[1;0m",
-			"\027[1;34m",
-			"\027[1;0m",
-			"\027[1;34m",
-			"\027[1;0m",
-			"\027[1;36m",
-			"\027[1;0m"
-		)
-	)
-end
-
-if (arg[1]=="search") then
-	if (arg[2]==nil) then
-		io.write("Search for ")
-		r=search(io.read())
-	else
-		r=search(arg[2])
+function plist(t)
+	for i=1, #t do
+		if (i < #t) then
+			io.write(t[i],", ")
+		else
+			io.write(t[i],"\n")
+		end
 	end
-elseif (arg[1]=="info") then
-	if (arg[2]==nil) then
-		io.write("Get info for ")
-		r=info(io.read())
+end
+
+function searchAUR(term)
+	print("Searching for "..term.."...\n")
+	local result = request(base_url.."/rpc/?v=5&type=search&by=name-desc&arg="..escape(term))
+
+	local r = json.decode(result)
+
+	if (r.resultcount>0) then
+		for i=1, r.resultcount do
+			local rr = r.results[i]
+			io.write(c.cyan,(rr.Maintainer or "unknown"),c.normal,"/",c.blue,rr.Name,c.normal,"\n",
+			rr.Description,"\n",
+			c.blue,"https://aur.archlinux.org/",rr.Name,".git",c.normal,"\n\n")
+		end
 	else
-		r=info(arg[2])
+		print("Couldn't find what you are looking for")
+		os.exit(1)
 	end
-elseif (arg[1]=="help") then
+end
+
+function infoAUR(program)
+	print("Getting information about "..program.."...\n")
+	local result = request(base_url.."/rpc/?v=5&type=info&arg[]="..escape(program))
+	if (result ~= '') then
+		local r = json.decode(result)
+
+		if (r.resultcount == 0) then
+			print("Couldn't find the package")
+			os.exit(1)
+		end
+
+		local rr = r.results[1]
+		io.write(c.cyan, (rr.Maintainer or "unknown"), c.normal, "/", c.blue, rr.Name, c.normal, "\n",
+		rr.Description, "\n\n",
+		c.blue, "Version ", c.cyan, rr.Version, c.normal,"\n")
+
+		if (rr.MakeDepends) then
+			io.write("\n",c.blue, "Compilation dependencies", c.normal, "\n")
+			plist(rr.MakeDepends)
+		end
+
+		if (rr.Depends) then
+			io.write("\n",c.blue, "Dependencies", c.normal, "\n")
+			plist(rr.Depends)
+		end
+
+		if (rr.OptDepends) then
+			io.write("\n",c.blue, "Optional dependencies", c.normal, "\n")
+			plist(rr.OptDepends)
+		end
+
+		if (rr.License) then
+			io.write("\n",c.blue, "License(s)", c.normal, "\n")
+			plist(rr.License)
+		end
+
+		if (rr.Provides) then
+			io.write("\n",c.blue, "Provides", c.normal, "\n")
+			plist(rr.Provides)
+		end
+
+		if (rr.Conflicts) then
+			io.write("\n",c.blue, "Conflicts", c.normal, "\n")
+			plist(rr.Conflicts)
+		end
+
+		if (rr.Keywords) then
+			io.write("\n",c.blue, "Keywords", c.normal, "\n")
+			plist(rr.Keywords)
+		end
+
+		io.write("\n",c.blue, "Clone URL: ",c.cyan,"https://aur.archlinux.org/",rr.Name,".git",c.normal,"\n")
+	else
+		print("No matches found")
+		os.exit(1)
+	end
+end
+
+function usage()
 	print([[
-----------------------------------------------------
-Zap, A lightning fast AUR searcher
-By Bowuigi
+Zap - lightning fast AUR searcher
 
 Usage:
-
-zap search   ---   finds a package on the AUR
-zap info     ---   gets info on a package on the AUR
-
-no argument defaults to search
-----------------------------------------------------]])
-	os.exit()
-else
-        if (arg[1]==nil) then
-                io.write("Search for ")
-                r=search(io.read())
-        else
-                r=search(arg[1])
-        end
+	'zap search string' to search for a term
+	'zap string' to search for a term
+	'zap info program' to get information on a program
+]])
 end
 
-print(r)
+if (arg[2]) then
+	if (arg[1]=="info") then
+		infoAUR(arg[2])
+	elseif (arg[1]=="search") then
+		searchAUR(arg[2])
+	else
+		usage()
+	end
+elseif (arg[1]) then
+	searchAUR(arg[1])
+else
+	usage()
+end
