@@ -4,6 +4,12 @@ A lightning fast AUR searcher (might evolve into a helper)
 
 Now rewritten!
 
+Dependencies
+------------
+
++ Lua (anything above 5.1 should work, even LuaJIT, just change the shebang)
++ curl
+
 Installation
 ------------
 
