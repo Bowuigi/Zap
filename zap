@@ -46,8 +46,8 @@ function searchAUR(term)
 	if (r.resultcount>0) then
 		for i=1, r.resultcount do
 			local rr = r.results[i]
-			io.write(c.cyan,(rr.Maintainer or "unknown"),c.normal,"/",c.blue,rr.Name,c.normal,"\n",
-			rr.Description,"\n",
+			io.write(c.cyan,(rr.Maintainer or "unknown"),c.normal,"/",c.blue,(rr.Name or "unknown"),c.normal,"\n",
+			(rr.Description or "No description"),"\n",
 			c.blue,"https://aur.archlinux.org/",rr.Name,".git",c.normal,"\n\n")
 		end
 	else
@@ -68,8 +68,8 @@ function infoAUR(program)
 		end
 
 		local rr = r.results[1]
-		io.write(c.cyan, (rr.Maintainer or "unknown"), c.normal, "/", c.blue, rr.Name, c.normal, "\n",
-		rr.Description, "\n\n",
+		io.write(c.cyan, (rr.Maintainer or "unknown"), c.normal, "/", c.blue, (rr.Name or "unknown"), c.normal, "\n",
+		(rr.Description or "No description"), "\n\n",
 		c.blue, "Version ", c.cyan, rr.Version, c.normal,"\n")
 
 		if (rr.MakeDepends) then
