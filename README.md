@@ -49,3 +49,10 @@ To provide basic usage commands, use
 ```sh
 zap help
 ```
+
+Configuration
+-------------
+
+Since there is not much configuration to do, the way you configure zap is by editing the top of the `zap` source file
+
+Information about each variable is included there
