@@ -18,12 +18,23 @@ local json = require("rxi-json")
 -- Base AUR URL
 local base_url = "https://aur.archlinux.org"
 
--- Some ANSI colors for pretty output
-local c = {
-	blue = "\027[1;34m",
-	cyan = "\027[1;36m",
-	normal = "\027[0m"
-}
+-- Some ANSI colors for pretty output if the output is a tty or if the NO_COLOR env variable is not set
+-- Detect if stdout is a tty from RosettaCode
+do
+	local ok, exit, signal = os.execute("test -t 1")
+	local isatty = ((ok and exit == "exit") and signal == 0 or false)
+	local no_color = os.getenv("NO_COLOR")
+
+	if (no_color) or (not isatty) then
+		c = {blue="",cyan="",normal=""}
+	else
+		c = {
+			blue = "\027[1;34m",
+			cyan = "\027[1;36m",
+			normal = "\027[0m"
+		}
+	end
+end
 
 -- From the Programming in Lua book, escape an URL
 function escape(s)
